@@ -3,8 +3,8 @@
 Description:
 -------------
 
-This powershell script is for setting up the environment for CSA Master Class. 
-All the nest set of steps should be run after the user has run this script for setting the environment.
+This powershell script is for setting up the environment for CSA Master Class and creating a resource group for deploying resources. 
+All the next set of steps should be run after the user has run this script for setting the environment.
 
 As part of this script, Users need to update the script variables subscriptionid and tenantid with the actual environments from the Azure Portal.
 
@@ -28,3 +28,5 @@ Login-AzureRmAccount
 
 
 Set-AzureRmContext -SubscriptionId $subscriptionId -TenantId $tenantId
+
+New-AzureRmResourceGroup -Name "m1-AzureIaaSEssentials" -Location "EastUS" -Force -Verbose
