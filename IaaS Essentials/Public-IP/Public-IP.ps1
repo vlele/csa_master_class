@@ -6,6 +6,11 @@ Description
 This script is used to deploy the Public-IP resources. 
 The template and the parameters are being referred from the repository as mentioned in the below variables templateUri & templateParameterUri
 
+-------------
+Dependencies
+-------------
+
+N/A
 
 #>
 
