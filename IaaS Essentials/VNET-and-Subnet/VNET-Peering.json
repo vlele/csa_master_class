@@ -1,0 +1,43 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "existingLocalVirtualNetworkName": {
+      "type": "String",
+      "defaultValue": "m1-vnet-01",
+      "metadata": {
+        "description": "The name of the existing VNET to which peering is to being added"
+      }
+    },
+    "existingRemoteVirtualNetworkName": {
+      "type": "String",
+      "defaultValue": "m1-vnet-02",
+      "metadata": {
+        "description": "The name of the VNET which is being added to peering as a remote VNET"
+      }
+    }
+  },
+  "variables": {
+    "peeringName": "[concat(parameters('existingLocalVirtualNetworkName'), '/peering-to-remote-vnet')]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2016-06-01",
+      "type": "Microsoft.Network/virtualNetworks/virtualNetworkPeerings",
+      "name": "[variables('peeringName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "allowVirtualNetworkAccess": true,
+        "allowForwardedTraffic": false,
+        "allowGatewayTransit": false,
+        "useRemoteGateways": false,
+        "remoteVirtualNetwork": {
+          "id": "[resourceId('Microsoft.Network/virtualNetworks', parameters('existingRemoteVirtualNetworkName'))]"
+        }
+      }
+    }
+
+  ],
+  "outputs": {
+  }
+}
