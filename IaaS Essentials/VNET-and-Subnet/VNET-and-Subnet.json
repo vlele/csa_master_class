@@ -6,7 +6,7 @@
       "type": "String",
       "defaultValue": "m1-nsg-WEB",
       "metadata": {
-        "description": "The prefix for the NSG Name"
+        "description": "The NSG Name for Application gateway to allow web traffic"
       }
     }
   },
