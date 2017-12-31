@@ -5,7 +5,7 @@ Description
 
 This script is used to deploy the Network Security Groups(NSG) resources. 
 
-Example illusrates hree flavors
+Example illusrates three flavors
 (i)   Default
 (ii)  RDP being allowed
 (iii) Web traffic being allowed for both http/https
@@ -16,7 +16,7 @@ Dependencies
 -------------
 
 1) This template uses the ApplicationGateway Address space which is used to create the NSG. The Application gateway need not be created at this 
-time but the design details should be present.
+time but the design details should be present for specifying the ip address range. As an alternative the security rule could be modified later.
 
 #>
 
