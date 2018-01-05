@@ -1,0 +1,106 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "nsgName": {
+      "type": "String",
+      "defaultValue": "m1-nsg-WEB",
+      "metadata": {
+        "description": "The NSG Name for Application gateway to allow web traffic"
+      }
+    }
+  },
+  "variables": {
+    "firstVNETName": "m1-vnet-01",
+    "firstVNETPrefix": "10.200.98.0/24",
+    "firstVNETFESubnetName1": "m1-appgateway-subnet",
+    "firstVNETFESubnet1Prefix": "10.200.98.0/28",
+    "firstVNETFESubnetName2": "m1-loadbalancer-subnet",
+    "firstVNETFESubnet2Prefix": "10.200.98.16/28",
+    "firstVNETFESubnetName3": "m1-subnet1",
+    "firstVNETFESubnet3Prefix": "10.200.98.32/28",
+    "secondVNETName": "m1-vnet-02",
+    "secondVNETPrefix": "10.200.99.0/24",
+    "secondVNETSubnetName1": "m1-vnet02-subnet1",
+    "secondVNETSubnet1Prefix": "10.200.99.0/28",
+    "DNSServerIP": "10.200.99.5",
+    "appGatewayNSG": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('nsgName'))]"
+
+  },
+  "resources": [
+    {
+      "name": "[variables('firstVNETName')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "CSA"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('firstVNETPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('firstVNETFESubnetName1')]",
+            "properties": {
+              "addressPrefix": "[variables('firstVNETFESubnet1Prefix')]",
+              "networkSecurityGroup": {
+                "id": "[variables('appGatewayNSG')]"
+              }
+
+            }
+          },
+          {
+            "name": "[variables('firstVNETFESubnetName2')]",
+            "properties": {
+              "addressPrefix": "[variables('firstVNETFESubnet2Prefix')]"
+            }
+          },
+          {
+            "name": "[variables('firstVNETFESubnetName3')]",
+            "properties": {
+              "addressPrefix": "[variables('firstVNETFESubnet3Prefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[variables('secondVNETName')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2015-06-15",
+      "tags": {
+        "Project": "CSA"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('secondVNETPrefix')]"
+          ]
+        },
+        "dhcpOptions": {
+          "dnsServers": ["[variables('DNSServerIP')]"]
+        },
+        "subnets": [
+          {
+            "name": "[variables('secondVNETSubnetName1')]",
+            "properties": {
+              "addressPrefix": "[variables('secondVNETSubnet1Prefix')]"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "existingVNETName": {
+      "type": "string",
+      "value": "[variables('firstVNETName')]"
+    }
+  }
+}

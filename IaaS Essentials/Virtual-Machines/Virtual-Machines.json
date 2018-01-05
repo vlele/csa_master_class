@@ -1,0 +1,167 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUserName": {
+      "type": "string",
+      "defaultValue": "csaadmin",
+      "metadata": {
+        "description": "The local admin name of the VM's"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The local admin password for the VM's"
+      }
+    }
+  },
+  "variables": {
+    "vmSetup": {
+      "vmImageReference": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2012-R2-Datacenter",
+        "version": "latest"
+      },
+      "vmName": "m1-VM1",
+      "vmNicName": "m1-Nic1",
+      "vmAvailabilitySet": "[resourceId('Microsoft.Compute/availabilitySets','m1-Availability-Set')]",
+      "diagnosticStorageAccount": "m1diagaccount",
+      "vmSize": "Standard_DS1_V2",
+      "vmList": [
+        {
+          "vmName": "m1-VM2",
+          "vmNicName": "m1-Nic2",
+          "vmAvailabilitySet": ""
+        },
+        {
+          "vmName": "m1-VM3",
+          "vmNicName": "m1-Nic3",
+          "vmAvailabilitySet": ""
+        }
+      ]
+
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-03-30",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[variables('vmSetup').vmList[copyIndex()].vmName]",
+      "location": "[resourcegroup().location]",
+      "copy": {
+        "name": "VMLoop",
+        "count": "[length(variables('vmSetup').vmList)]"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('vmSetup').vmSize]"
+        },
+        "osProfile": {
+          "computerName": "[variables('vmSetup').vmList[copyIndex()].vmName]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": "[variables('vmSetup').vmImageReference]",
+          "osDisk": {
+            "osType": "Windows",
+            "name": "[concat(variables('vmSetup').vmList[copyIndex()].vmName,'-osdisk')]",
+            "managedDisk": {
+              "storageAccountType": "Standard_LRS"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS"
+              },
+              "name": "[concat(variables('vmSetup').vmList[copyIndex()].vmName,'-data-disk1')]",
+              "caching": "ReadWrite",
+              "createOption": "Empty",
+              "diskSizeGB": 128,
+              "lun": 0
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces',variables('vmSetup').vmList[copyIndex()].vmNicName)]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('vmSetup').diagnosticStorageAccount), '2016-01-01').primaryEndpoints.blob)]"
+          }
+        }
+      }
+    },
+    {
+      "comments": "VM in an availability set",
+      "apiVersion": "2017-03-30",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[variables('vmSetup').vmName]",
+      "location": "[resourcegroup().location]",
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('vmSetup').vmSize]"
+        },
+        "availabilitySet": {
+          "id": "[variables('vmSetup').vmAvailabilitySet]"
+        },
+        "osProfile": {
+          "computerName": "[variables('vmSetup').vmName]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": "[variables('vmSetup').vmImageReference]",
+          "osDisk": {
+            "osType": "Windows",
+            "name": "[concat(variables('vmSetup').vmName,'-osdisk')]",
+            "managedDisk": {
+              "storageAccountType": "Standard_LRS"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS"
+              },
+              "name": "[concat(variables('vmSetup').vmName,'-data-disk1')]",
+              "caching": "ReadWrite",
+              "createOption": "Empty",
+              "diskSizeGB": 128,
+              "lun": 0
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId(resourceGroup().name,'Microsoft.Network/networkInterfaces',variables('vmSetup').vmNicName)]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('vmSetup').diagnosticStorageAccount), '2016-01-01').primaryEndpoints.blob)]"
+          }
+        }
+      }
+    }
+
+  ],
+  "outputs": {
+  }
+}
