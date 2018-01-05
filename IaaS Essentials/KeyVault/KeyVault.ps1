@@ -32,7 +32,7 @@ $adminpassword = Read-Host -assecurestring "Enter local admin password for VMs"
 $aadUser = Get-AzureRmADUser -Mail (Get-AzureRmContext).Account.Id
 
  New-AzureRmResourceGroupDeployment -Name "KeyVault-Deployment" -ResourceGroupName $resourceGroupName -Mode Incremental `
- -TemplateUri $templateUri -TemplateParameterUri $templateParameterUri -user-object-id $aadUser.Id -adminpassword $adminpassword -Verbose
+ -TemplateUri $templateUri  -user-object-id $aadUser.Id -adminpassword $adminpassword -Verbose
 
 
  <#
