@@ -20,7 +20,7 @@ $resourceGroupName = 'm1-AzureIaaSEssentials'
 
 $resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName
 
-$githubHandle = 'https://raw.githubusercontent.com/manishkumar-agarwal/'
+$githubHandle = 'https://raw.githubusercontent.com/vlele/'
 
 $templateUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/KeyVault/KeyVault.json'
 

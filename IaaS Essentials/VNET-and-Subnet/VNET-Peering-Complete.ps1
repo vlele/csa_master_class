@@ -3,16 +3,15 @@
 Description
 ------------
 
-This script is used to deploy the VNETS and Subnet resources.
-There will be 2 VNETS created and corresponding subnets created in each of those.
-Updation of the DNS server for one VNET and using of a NSG is done for demonstraton purpose 
+This script is used to add a VNET-Peering between two existing VNET resources.
+
 The template and the parameters are being referred from the repository as mentioned in the below variables templateUri & templateParameterUri
 
 -------------
 Dependencies
 -------------
 
-1) The NSG script should be run before this script. The subnet uses the NSG for setup
+1) The VNET-and-Subnet script should be run before this script. Both the VNETS are being created in the same script
 2) The design details for the Virtual Network and Subnet should be present
 
 #>
@@ -24,12 +23,12 @@ $resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName
 
 $githubHandle = 'https://raw.githubusercontent.com/vlele/'
 
-$templateUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/VNET-and-Subnet/VNET-and-Subnet.json'
+$templateUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/VNET-and-Subnet/VNET-Peering.json'
 
-$templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/VNET-and-Subnet/VNET-and-Subnet.parameters.json'
+$templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/VNET-and-Subnet/VNET-Peering-Complete.parameters.json'
 
 
- New-AzureRmResourceGroupDeployment -Name "VNET-Subnet-Deployment" -ResourceGroupName $resourceGroupName -Mode Incremental `
+ New-AzureRmResourceGroupDeployment -Name "VNET-Peering-Complete-Deployment" -ResourceGroupName $resourceGroupName -Mode Incremental `
  -TemplateUri $templateUri -TemplateParameterUri $templateParameterUri -Verbose
 
 
@@ -43,7 +42,7 @@ $templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentia
  ---------------------------------------------------------------------------------------------------------------------------
 
 
- New-AzureRmResourceGroupDeployment -Name "VNET-Subnet-Deployment"  -ResourceGroupName 'm1-AzureIaaSEssentials' -Mode Incremental `
- -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\VNET-and-Subnet\VNET-and-Subnet.json" `
- -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\VNET-and-Subnet\VNET-and-Subnet.parameters.json" -Verbose
+ New-AzureRmResourceGroupDeployment -Name "VNET-Peering-Complete-Deployment"  -ResourceGroupName 'm1-AzureIaaSEssentials' -Mode Incremental `
+ -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\VNET-and-Subnet\VNET-Peering.json" `
+ -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\VNET-and-Subnet\VNET-Peering-Complete.parameters.json" -Verbose
  #>
