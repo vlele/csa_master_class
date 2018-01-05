@@ -17,6 +17,10 @@ Dependencies
 2) The Public IP address script should be run before this script
 3) The NSG should be run before this script
 4) The Nic should be run before this script
+5) The Keyvault should be run before this script. The local adminPassword is retrieved from the keyvault.
+     
+    (The Virtual-Machines.parameters.json file must be updated with the Resource-id of the key-vault.
+     However for this demo, the secretValue is fetched in powershell and sent as parameter)
 
 #>
 
@@ -31,9 +35,11 @@ $templateUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/Virtua
 
 $templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/Virtual-Machines/Virtual-Machines.parameters.json'
 
+$adminpasswordSecret = Get-AzureKeyVaultSecret -VaultName 'm1-keyvault' -Name 'adminpassword'
+
 
  New-AzureRmResourceGroupDeployment -Name "Virtual-Machines-Deployment" -ResourceGroupName $resourceGroupName -Mode Incremental `
- -TemplateUri $templateUri -TemplateParameterUri $templateParameterUri -Verbose
+ -TemplateUri $templateUri -TemplateParameterUri $templateParameterUri -adminPassword $adminpasswordSecret.SecretValue -Verbose
 
 
  <#
@@ -45,8 +51,10 @@ $templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentia
  This would work only in cases of the main template or stand alone templates
  ---------------------------------------------------------------------------------------------------------------------------
 
+ $adminpasswordSecret = Get-AzureKeyVaultSecret -VaultName 'm1-keyvault' -Name 'adminpassword'
 
  New-AzureRmResourceGroupDeployment -Name "Virtual-Machines-Deployment"  -ResourceGroupName 'm1-AzureIaaSEssentials' -Mode Incremental `
  -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\Virtual-Machines\Virtual-Machines.json" `
- -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\Virtual-Machines\Virtual-Machines.parameters.json" -Verbose
+ -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\Virtual-Machines\Virtual-Machines.parameters.json" `
+ -adminPassword $adminpasswordSecret.SecretValue -Verbose
  #>

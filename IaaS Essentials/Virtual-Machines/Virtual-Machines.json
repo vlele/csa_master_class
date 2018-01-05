@@ -3,17 +3,17 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "adminUserName": {
-      "type": "String",
-      "defaultValue": "m1-nsg-RDP",
+      "type": "string",
+      "defaultValue": "csaadmin",
       "metadata": {
-        "description": "The name of the existing NSG"
+        "description": "The local admin name of the VM's"
       }
     },
     "adminPassword": {
       "type": "securestring",
       "defaultValue": "",
       "metadata": {
-        "description": "The name of the Nic prefix"
+        "description": "The local admin password for the VM's"
       }
     }
   },
