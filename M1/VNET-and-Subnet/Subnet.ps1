@@ -23,9 +23,9 @@ $resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName
 
 $githubHandle = 'https://raw.githubusercontent.com/vlele/'
 
-$templateUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/VNET-and-Subnet/Subnet.json'
+$templateUri = $githubHandle + 'csa_master_class/master/M1/VNET-and-Subnet/Subnet.json'
 
-$templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/VNET-and-Subnet/Subnet.parameters.json'
+$templateParameterUri = $githubHandle + 'csa_master_class/master/M1/VNET-and-Subnet/Subnet.parameters.json'
 
 
  New-AzureRmResourceGroupDeployment -Name "Add-Subnet-Deployment" -ResourceGroupName $resourceGroupName -Mode Incremental `
@@ -43,6 +43,6 @@ $templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentia
 
 
  New-AzureRmResourceGroupDeployment -Name "Add-Subnet-Deployment"  -ResourceGroupName 'm1-AzureIaaSEssentials' -Mode Incremental `
- -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\VNET-and-Subnet\Subnet.json" `
- -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\VNET-and-Subnet\Subnet.parameters.json" -Verbose
+ -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\VNET-and-Subnet\Subnet.json" `
+ -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\VNET-and-Subnet\Subnet.parameters.json" -Verbose
  #>

@@ -22,9 +22,9 @@ $resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName
 
 $githubHandle = 'https://raw.githubusercontent.com/vlele/'
 
-$templateUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/KeyVault/KeyVault.json'
+$templateUri = $githubHandle + 'csa_master_class/master/M1/KeyVault/KeyVault.json'
 
-$templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/KeyVault/KeyVault.parameters.json'
+$templateParameterUri = $githubHandle + 'csa_master_class/master/M1/KeyVault/KeyVault.parameters.json'
 
 
 $adminpassword = Read-Host -assecurestring "Enter local admin password for VMs"
@@ -49,7 +49,7 @@ $aadUser = Get-AzureRmADUser -Mail (Get-AzureRmContext).Account.Id
  $aadUser = Get-AzureRmADUser -Mail (Get-AzureRmContext).Account.Id
 
  New-AzureRmResourceGroupDeployment -Name "KeyVault-Deployment"  -ResourceGroupName 'm1-AzureIaaSEssentials' -Mode Incremental `
- -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\KeyVault\KeyVault.json" `
- -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\KeyVault\KeyVault.parameters.json"  `
+ -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\KeyVault\KeyVault.json" `
+ -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\KeyVault\KeyVault.parameters.json"  `
  -user-object-id $aadUser.Id -adminpassword $adminpassword -Verbose
  #>

@@ -21,9 +21,9 @@ $resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName
 
 $githubHandle = 'https://raw.githubusercontent.com/vlele/'
 
-$templateUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/Public-IP/Public-IP.json'
+$templateUri = $githubHandle + 'csa_master_class/master/M1/Public-IP/Public-IP.json'
 
-$templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/Public-IP/Public-IP.parameters.json'
+$templateParameterUri = $githubHandle + 'csa_master_class/master/M1/Public-IP/Public-IP.parameters.json'
 
 
  New-AzureRmResourceGroupDeployment -Name "PublicIPDeployment" -ResourceGroupName $resourceGroupName -Mode Incremental `
@@ -41,6 +41,6 @@ $templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentia
 
 
  New-AzureRmResourceGroupDeployment -Name "PublicIpDeployment"  -ResourceGroupName 'm1-AzureIaaSEssentials' -Mode Incremental `
- -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\Public-IP\Public-IP.json" `
- -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\Public-IP\Public-IP.parameters.json" -Verbose
+ -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\Public-IP\Public-IP.json" `
+ -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\Public-IP\Public-IP.parameters.json" -Verbose
  #>

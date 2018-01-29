@@ -27,9 +27,9 @@ $resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName
 
 $githubHandle = 'https://raw.githubusercontent.com/vlele/'
 
-$templateUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/NSG/NSG.json'
+$templateUri = $githubHandle + 'csa_master_class/master/M1/NSG/NSG.json'
 
-$templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/NSG/NSG.parameters.json'
+$templateParameterUri = $githubHandle + 'csa_master_class/master/M1/NSG/NSG.parameters.json'
 
 
  New-AzureRmResourceGroupDeployment -Name "NSGDeployment" -ResourceGroupName $resourceGroupName -Mode Incremental `
@@ -47,6 +47,6 @@ $templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentia
 
 
  New-AzureRmResourceGroupDeployment -Name "NSGDeployment"  -ResourceGroupName 'm1-AzureIaaSEssentials' -Mode Incremental `
- -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\NSG\NSG.json" `
- -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\NSG\NSG.parameters.json" -Verbose
+ -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\NSG\NSG.json" `
+ -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\NSG\NSG.parameters.json" -Verbose
  #>

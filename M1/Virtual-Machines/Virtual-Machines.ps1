@@ -31,9 +31,9 @@ $resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName
 
 $githubHandle = 'https://raw.githubusercontent.com/vlele/'
 
-$templateUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/Virtual-Machines/Virtual-Machines.json'
+$templateUri = $githubHandle + 'csa_master_class/master/M1/Virtual-Machines/Virtual-Machines.json'
 
-$templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/Virtual-Machines/Virtual-Machines.parameters.json'
+$templateParameterUri = $githubHandle + 'csa_master_class/master/M1/Virtual-Machines/Virtual-Machines.parameters.json'
 
 $adminpasswordSecret = Get-AzureKeyVaultSecret -VaultName 'm1-keyvault' -Name 'adminpassword'
 
@@ -54,7 +54,7 @@ $adminpasswordSecret = Get-AzureKeyVaultSecret -VaultName 'm1-keyvault' -Name 'a
  $adminpasswordSecret = Get-AzureKeyVaultSecret -VaultName 'm1-keyvault' -Name 'adminpassword'
 
  New-AzureRmResourceGroupDeployment -Name "Virtual-Machines-Deployment"  -ResourceGroupName 'm1-AzureIaaSEssentials' -Mode Incremental `
- -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\Virtual-Machines\Virtual-Machines.json" `
- -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\Virtual-Machines\Virtual-Machines.parameters.json" `
+ -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\Virtual-Machines\Virtual-Machines.json" `
+ -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\Virtual-Machines\Virtual-Machines.parameters.json" `
  -adminPassword $adminpasswordSecret.SecretValue -Verbose
  #>

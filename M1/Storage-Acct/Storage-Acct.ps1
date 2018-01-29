@@ -22,9 +22,9 @@ $resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName
 
 $githubHandle = 'https://raw.githubusercontent.com/vlele/'
 
-$templateUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/Storage-Acct/Storage-Acct.json'
+$templateUri = $githubHandle + 'csa_master_class/master/M1/Storage-Acct/Storage-Acct.json'
 
-$templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/Storage-Acct/Storage-Acct.parameters.json'
+$templateParameterUri = $githubHandle + 'csa_master_class/master/M1/Storage-Acct/Storage-Acct.parameters.json'
 
 
  New-AzureRmResourceGroupDeployment -Name "Storage-Acct-Deployment" -ResourceGroupName $resourceGroupName -Mode Incremental `
@@ -42,6 +42,6 @@ $templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentia
 
 
  New-AzureRmResourceGroupDeployment -Name "Storage-Acct-Deployment"  -ResourceGroupName 'm1-AzureIaaSEssentials' -Mode Incremental `
- -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\Storage-Acct\Storage-Acct.json" `
- -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\Storage-Acct\Storage-Acct.parameters.json" -Verbose
+ -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\Storage-Acct\Storage-Acct.json" `
+ -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\Storage-Acct\Storage-Acct.parameters.json" -Verbose
  #>

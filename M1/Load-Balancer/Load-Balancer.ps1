@@ -23,9 +23,9 @@ $resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName
 
 $githubHandle = 'https://raw.githubusercontent.com/vlele/'
 
-$templateUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/Load-Balancer/Load-Balancer.json'
+$templateUri = $githubHandle + 'csa_master_class/master/M1/Load-Balancer/Load-Balancer.json'
 
-$templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentials/Load-Balancer/Load-Balancer.parameters.json'
+$templateParameterUri = $githubHandle + 'csa_master_class/master/M1/Load-Balancer/Load-Balancer.parameters.json'
 
 
  New-AzureRmResourceGroupDeployment -Name "Load-Balancer-Deployment" -ResourceGroupName $resourceGroupName -Mode Incremental `
@@ -43,6 +43,6 @@ $templateParameterUri = $githubHandle + 'csa_master_class/master/IaaS%20Essentia
 
 
  New-AzureRmResourceGroupDeployment -Name "Load-Balancer-Deployment"  -ResourceGroupName 'm1-AzureIaaSEssentials' -Mode Incremental `
- -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\Load-Balancer\Load-Balancer.json" `
- -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\IaaS Essentials\Load-Balancer\Load-Balancer.parameters.json" -Verbose
+ -TemplateFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\Load-Balancer\Load-Balancer.json" `
+ -TemplateParameterFile "C:\Users\aisadmin\Source\Repos\csa_master_class\M1\Load-Balancer\Load-Balancer.parameters.json" -Verbose
  #>
