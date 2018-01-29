@@ -1,0 +1,12 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "newSubnetName": {
+      "value": "m1-vnet02-subnet2"
+    },
+    "newSubnetAddressPrefix": {
+      "value": "10.200.99.16/28"
+    }
+  }
+}

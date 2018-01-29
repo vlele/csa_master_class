@@ -1,0 +1,106 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSecurityGroupName": {
+      "type": "String",
+      "defaultValue": "m1-nsg-RDP",
+      "metadata": {
+        "description": "The name of the existing NSG"
+      }
+    },
+    "networkInterfaceNamePrefix": {
+      "type": "String",
+      "defaultValue": "m1-Nic",
+      "metadata": {
+        "description": "The name of the Nic prefix"
+      }
+    },
+    "publicIPAddressName": {
+      "type": "String",
+      "defaultValue": "m1-publicIp0",
+      "metadata": {
+        "description": "The name of the public ip to be linked to Nic"
+      }
+    }
+  },
+  "variables": {
+    "vnet1SubnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks','m1-vnet-01'),'/subnets/','m1-subnet1')]",
+    "vnet2SubnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks','m1-vnet-02'),'/subnets/','m1-vnet02-subnet1')]"
+  },
+  "resources": [
+    {
+      "comments": "Network Interface Resource with NSG and Public Ip",
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(parameters('networkInterfaceNamePrefix'),'1')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroupName'))]"
+        },
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName'))]"
+              },
+              "subnet": {
+                "id": "[variables('vnet1SubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "comments": "Network Interface Resource from VNET1, adding to load balancer",
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(parameters('networkInterfaceNamePrefix'),'2')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers','m1-LoadBalancer'),'/backendAddressPools/BackendPool1')]"
+                }
+              ],
+              "subnet": {
+                "id": "[variables('vnet1SubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "comments": "Network Interface Resource from VNET2",
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat(parameters('networkInterfaceNamePrefix'),'3')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('vnet2SubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+  }
+}

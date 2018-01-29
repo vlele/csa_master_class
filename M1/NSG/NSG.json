@@ -1,0 +1,93 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "nsgNamePrefix": {
+      "type": "String",
+      "defaultValue": "nsg",
+      "metadata": {
+        "description": "The prefix for the NSG Name"
+      }
+    },
+    "appGatewayAddressRange": {
+      "type": "string",
+      "defaultValue": "10.200.98.0/28",
+      "metadata": {
+        "description": "This is the address range to allow the web traffic"
+      }
+    }
+  },
+  "variables": {
+    "nsgArray": [
+      {
+        "name": "[concat('m1-',parameters('nsgNamePrefix'),'-default')]",
+        "securityRules": []
+      },
+      {
+        "name": "[concat('m1-',parameters('nsgNamePrefix'),'-RDP')]",
+        "securityRules": [
+          {
+            "name": "RDP",
+            "properties": {
+              "protocol": "TCP",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 102,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      },
+      {
+        "name": "[concat('m1-',parameters('nsgNamePrefix'),'-WEB')]",
+        "securityRules": [
+          {
+            "name": "HTTP",
+            "properties": {
+              "protocol": "TCP",
+              "sourcePortRange": "*",
+              "destinationPortRange": "80",
+              "sourceAddressPrefix": "[parameters('appGatewayAddressRange')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 106,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "HTTPS",
+            "properties": {
+              "protocol": "TCP",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "[parameters('appGatewayAddressRange')]",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 105,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('nsgArray')[copyIndex()].name]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "nsgLoop",
+        "count": "[length(variables('nsgArray'))]"
+      },
+      "properties": {
+        "securityRules": "[variables('nsgArray')[copyIndex()].securityRules]"
+      }
+    }
+  ],
+  "outputs": {}
+}

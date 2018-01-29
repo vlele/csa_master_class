@@ -1,0 +1,122 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "user-object-id": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Guid id for the User to be granted access. Found in AAD."
+      }
+    },
+    "adminpassword": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Password which will be used while creating Virtual Machines."
+      }
+    },
+    "vaultSku": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "allowedValues": [
+        "Standard",
+        "Premium"
+      ],
+      "metadata": {
+        "description": "SKU for the key vault."
+      }
+    },
+    "enabledForDeployment": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Specifies if the vault is enabled for VM or Service Fabric deployment"
+      }
+    },
+    "enabledForTemplateDeployment": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Specifies if the vault is enabled for ARM template deployment"
+      }
+    },
+    "enableVaultForVolumeEncryption": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Specifies if the vault is enabled for volume encryption"
+      }
+    }
+
+  },
+  "variables": {
+    "keyVaultName": "m1-keyvault",
+    "accessPolicies": [
+      {
+        "tenantId": "[subscription().tenantId]",
+        "objectId": "[parameters('user-object-id')]",
+        "permissions": {
+          "keys": [ "all" ],
+          "secrets": [ "all" ]
+        }
+      }
+    ],
+    "secretsObject": {
+      "secrets": [
+        {
+          "secretName": "adminpassword",
+          "secretValue": "[parameters('adminpassword')]"
+        },
+        {
+          "secretName": "secretName",
+          "secretValue": "secretValue"
+        }
+      ]
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "name": "[variables('keyVaultName')]",
+      "apiVersion": "2015-06-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "KeyVault"
+      },
+      "properties": {
+        "enabledForDeployment": "[parameters('enabledForDeployment')]",
+        "enabledForTemplateDeployment": "[parameters('enabledForTemplateDeployment')]",
+        "enabledForVolumeEncryption": "[parameters('enableVaultForVolumeEncryption')]",
+        "tenantId": "[subscription().tenantId]",
+        "accessPolicies": "[variables('accessPolicies')]",
+        "sku": {
+          "name": "[parameters('vaultSku')]",
+          "family": "A"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/secrets",
+      "name": "[concat(variables('keyVaultName'), '/', variables('secretsObject').secrets[copyIndex()].secretName)]",
+      "apiVersion": "2015-06-01",
+      "properties": {
+        "value": "[variables('secretsObject').secrets[copyIndex()].secretValue]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+      ],
+      "copy": {
+        "name": "secretsCopy",
+        "count": "[length(variables('secretsObject').secrets)]"
+      }
+    }
+
+  ],
+  "outputs": {
+    "keyVaultName": {
+      "type": "string",
+      "value": "[variables('keyVaultName')]"
+    }
+  }
+}

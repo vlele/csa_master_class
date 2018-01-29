@@ -1,0 +1,196 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "existingVNETName": {
+      "type": "String",
+      "defaultValue": "m1-vnet-01",
+      "metadata": {
+        "description": "The name of the existing VNET to which Application Gateway is to be added"
+      }
+    },
+    "existingSubnetName": {
+      "type": "String",
+      "defaultValue": "m1-appgateway-subnet",
+      "metadata": {
+        "description": "The name of the subnet to which Application Gateway is be added"
+      }
+    },
+    "applicationGatewayName": {
+      "type": "string",
+      "defaultValue": "m1-applicationGateway1",
+      "metadata": {
+        "description": "application gateway name"
+      }
+    },
+    "applicationGatewaySize": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_Small",
+        "Standard_Medium",
+        "Standard_Large"
+      ],
+      "defaultValue": "Standard_Small",
+      "metadata": {
+        "description": "application gateway size"
+      }
+    },
+    "applicationGatewayInstanceCount": {
+      "type": "int",
+      "allowedValues": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "defaultValue": 4,
+      "metadata": {
+        "description": "application gateway instance count"
+      }
+    },
+    "frontendPort": {
+      "type": "int",
+      "defaultValue": 80,
+      "metadata": {
+        "description": "application gateway front end port"
+      }
+    },
+    "backendPort": {
+      "type": "int",
+      "defaultValue": 80,
+      "metadata": {
+        "description": "application gateway back end port"
+      }
+    },
+    "backendIPAddresses": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "IpAddress": "10.200.98.42"
+        },
+        {
+          "IpAddress": "10.200.98.43"
+        }
+      ],
+      "metadata": {
+        "description": "back end pool ip addresses"
+      }
+    },
+    "cookieBasedAffinity": {
+      "type": "string",
+      "allowedValues": [
+        "Enabled",
+        "Disabled"
+      ],
+      "defaultValue": "Disabled",
+      "metadata": {
+        "description": "cookie based affinity"
+      }
+    }
+  },
+  "variables": {
+    "subnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks',parameters('existingVNETName')),'/subnets/',parameters('existingSubnetName'))]"
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-06-01",
+      "name": "[parameters('applicationGatewayName')]",
+      "type": "Microsoft.Network/applicationGateways",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [],
+      "properties": {
+        "sku": {
+          "name": "[parameters('applicationGatewaySize')]",
+          "tier": "Standard",
+          "capacity": "[parameters('applicationGatewayInstanceCount')]"
+        },
+        "gatewayIPConfigurations": [
+          {
+            "name": "appGatewayIpConfig",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              }
+            }
+          }
+        ],
+        "frontendIPConfigurations": [
+          {
+            "name": "appGatewayFrontendIP",
+            "properties": {
+              "subnet": {
+                "id": "[variables('subnetRef')]"
+              }
+            }
+          }
+        ],
+        "frontendPorts": [
+          {
+            "name": "appGatewayFrontendPort",
+            "properties": {
+              "Port": "[parameters('frontendPort')]"
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "appGatewayBackendPool",
+            "properties": {
+              "BackendAddresses": "[parameters('backendIPAddresses')]"
+            }
+          }
+        ],
+        "backendHttpSettingsCollection": [
+          {
+            "name": "appGatewayBackendHttpSettings",
+            "properties": {
+              "Port": "[parameters('backendPort')]",
+              "Protocol": "Http",
+              "CookieBasedAffinity": "[parameters('cookieBasedAffinity')]"
+            }
+          }
+        ],
+        "httpListeners": [
+          {
+            "name": "appGatewayHttpListener",
+            "properties": {
+              "FrontendIpConfiguration": {
+                "Id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/frontendIPConfigurations/appGatewayFrontendIP')]"
+              },
+              "FrontendPort": {
+                "Id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/frontendPorts/appGatewayFrontendPort')]"
+              },
+              "Protocol": "Http",
+              "SslCertificate": null
+            }
+          }
+        ],
+        "requestRoutingRules": [
+          {
+            "Name": "rule1",
+            "properties": {
+              "RuleType": "Basic",
+              "httpListener": {
+                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/httpListeners/appGatewayHttpListener')]"
+              },
+              "backendAddressPool": {
+                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/backendAddressPools/appGatewayBackendPool')]"
+              },
+              "backendHttpSettings": {
+                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/backendHttpSettingsCollection/appGatewayBackendHttpSettings')]"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+  }
+}

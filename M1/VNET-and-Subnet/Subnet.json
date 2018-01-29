@@ -1,0 +1,42 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "existingVNETName": {
+      "type": "String",
+      "defaultValue": "m1-vnet-02",
+      "metadata": {
+        "description": "The name of the existing VNET to which subnet is to be added"
+      }
+    },
+    "newSubnetName": {
+      "type": "String",
+      "defaultValue": "m1-vnet02-subnet2",
+      "metadata": {
+        "description": "The name of the new subnet to be added"
+      }
+    },
+    "newSubnetAddressPrefix": {
+      "type": "String",
+      "defaultValue": "10.200.99.16/28",
+      "metadata": {
+        "description": "The address range of the new subnet to be added"
+      }
+    }
+  },
+  "variables": {
+  },
+  "resources": [
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "name": "[concat(parameters('existingVNETName'), '/', parameters('newSubnetName'))]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressPrefix": "[parameters('newSubnetAddressPrefix')]"
+      }
+    }
+  ],
+  "outputs": {
+  }
+}
