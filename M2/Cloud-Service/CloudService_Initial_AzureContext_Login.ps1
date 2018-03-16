@@ -8,7 +8,6 @@ All the next set of steps should be run after the user has run this script for s
 
 As part of this script, Users need to update the script variables subscriptionid and tenantid with the actual environments from the Azure Portal.
 
-This script will also create a storage account and a table loaded with sample data in it.
 
 --------------
 Inputs Needed:
@@ -19,6 +18,7 @@ Inputs Needed:
 
 
 2) Tenant Id --> This is the id of the Azure Active Directory(AAD) and can be got from the properties inside the AAD
+
 
 #>
 
@@ -33,20 +33,5 @@ Set-AzureRmContext -SubscriptionId $subscriptionId -TenantId $tenantId
 
 $resourceGroupName = "m2-CloudService"
 
-New-AzureRmResourceGroup -Name $resourceGroupName  -Location "EastUS" -Force -Verbose
+$resourceGroup = New-AzureRmResourceGroup -Name $resourceGroupName  -Location "EastUS" -Force -Verbose
 
-
-
-#Create the storage account
-
-$resourceGroup = Get-AzureRmResourceGroup -Name $resourceGroupName
-
-$githubHandle = 'https://raw.githubusercontent.com/vlele/'
-
-$templateUri = $githubHandle + 'csa_master_class/master/M1/Storage-Acct/Storage-Acct.json'
-
-$templateParameterUri = $githubHandle + 'csa_master_class/master/M2/Cloud-Service/Storage-Acct.parameters.json'
-
-
- New-AzureRmResourceGroupDeployment -Name "Storage-Acct-Deployment" -ResourceGroupName $resourceGroupName -Mode Incremental `
- -TemplateUri $templateUri -TemplateParameterUri $templateParameterUri -Verbose
