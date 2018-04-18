@@ -5,7 +5,9 @@ Description
 
 This script is used to create Virtual Machines.
 Windows Server 2012 R2 Data center VM's are created as part of this demonstration.
-The VM's will use managed disks for the VM's and a storage account for the diagnostics
+The VM's will use managed disks for the VM's and a storage account for the diagnostics.
+
+One of the VM's will also have the Managed Service Identity(MSI) enabled and will be used in the MSI demo.
 
 The template and the parameters are being referred from the repository as mentioned in the below variables templateUri & templateParameterUri
 

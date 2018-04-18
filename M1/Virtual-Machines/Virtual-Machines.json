@@ -22,7 +22,7 @@
       "vmImageReference": {
         "publisher": "MicrosoftWindowsServer",
         "offer": "WindowsServer",
-        "sku": "2012-R2-Datacenter",
+        "sku": "2016-Datacenter-smalldisk",
         "version": "latest"
       },
       "vmName": "m1-VM1",
@@ -107,6 +107,9 @@
       "comments": "VM in an availability set",
       "apiVersion": "2017-03-30",
       "type": "Microsoft.Compute/virtualMachines",
+      "identity": {
+        "type": "systemAssigned"
+      },
       "name": "[variables('vmSetup').vmName]",
       "location": "[resourcegroup().location]",
       "properties": {
@@ -158,6 +161,25 @@
             "storageUri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts/', variables('vmSetup').diagnosticStorageAccount), '2016-01-01').primaryEndpoints.blob)]"
           }
         }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('vmSetup').vmName,'/ManagedIdentityExtensionForWindows')]",
+      "apiVersion": "2016-03-30",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmSetup').vmName)]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.ManagedIdentity",
+        "type": "ManagedIdentityExtensionForWindows",
+        "typeHandlerVersion": "1.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "port": 50342
+        },
+        "protectedSettings": {}
       }
     }
 
