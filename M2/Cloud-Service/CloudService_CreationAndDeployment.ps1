@@ -21,19 +21,18 @@ Inputs Needed:
 #>
 
 
-$subscriptionId = 'SUBSCRIPTION ID'
+$subscriptionId = ''
 
 
-$pathToCloudServiceConfiguration = 'PATH to .CSCFG File'
+$pathToCloudServicePackage = 'C:\Users\aisadmin\Source\Repos\csa_master_class\M2\Cloud-Service\CloudServiceDeployables\CloudSample.cspkg'
+$pathToCloudServiceConfiguration = 'C:\Users\aisadmin\Source\Repos\csa_master_class\M2\Cloud-Service\CloudServiceDeployables\CloudSample.cscfg'
 
 Add-AzureAccount 
 
 
 Select-AzureSubscription -SubscriptionId $subscriptionId  -Default 
 
-
-#Set-AzureSubscription -SubscriptionId $subscriptionId
-
+Set-AzureSubscription -SubscriptionId $subscriptionId
 
 
 #create the cloud service
@@ -43,8 +42,13 @@ $cloudServiceName = 'm2cloudservice'
 New-AzureService -ServiceName $cloudServiceName -Location 'East US' -Label $cloudServiceName
 
 
+New-AzureStorageAccount -StorageAccountName 'm2clouddemo' -Label $cloudServiceName -Location 'East US'
 
-New-AzureDeployment -ServiceName 'm2cloudservice' -Slot 'Production' -Package 'https://m2cloudservice.blob.core.windows.net/cloudservicedeployables/CloudSample.cspkg' `
+
+Set-AzureSubscription -CurrentStorageAccountName 'm2clouddemo' -SubscriptionId $subscriptionId 
+
+
+New-AzureDeployment -ServiceName $cloudServiceName -Slot 'Production' -Package $pathToCloudServicePackage `
 -Configuration $pathToCloudServiceConfiguration   -label 'initialdeploy' 
 
 
