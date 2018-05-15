@@ -1,0 +1,1 @@
+﻿Remove-AzureRmResourceGroup -Name "m1-terraformtestResourceGroup" 
