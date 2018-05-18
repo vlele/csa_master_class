@@ -12,6 +12,8 @@
 	terraform init  --> Initiates and gets the required libraries for the provider(in this case 'azurerm')
 	terraform plan  --> Generates a plan based on the terrafrom script in the file (testscript-vmcreation.tf)
 	terraform apply --> Deploys the actual resources on Azure
+	                   (or)
+	Terraform apply -auto-approve --> Deploys the actual resoruces on Azure but does not prompt for confirmation
 
 7) Verify that the resources are actually provisioned in the Azure Portal
 

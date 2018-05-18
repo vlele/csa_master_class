@@ -6,9 +6,9 @@
 4) Run the script CloudService_CreationAndDeployment.ps1 (This script will deploy the Cloud Service)
 5) Verify the cloud service is deployed and update the config in cloud service to test the same
 	Config Updates: (Cloud Service --> Configuration)
-	- Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString
-	- StorageAccount.ConnectionString
-	- CloudServiceIP
+	- Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString (This value is the connection string of the storage account created in the CloudService_Initial_DataSetup.ps1 script )
+	- StorageAccount.ConnectionString (This value is the connection string of the storage account created in the CloudService_Initial_DataSetup.ps1 script )
+	- CloudServiceIP (This is the Public IP address of the cloud service)
 6) Test the cloud Service
 
 
