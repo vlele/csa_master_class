@@ -1,0 +1,51 @@
+# This script is for the demo of Event Grid.
+# An Azure Blob storage is being used to demo the Event Grid functionality. The Azure Blob storage is the 'Publisher'
+# and the Web hook would be the 'Subscriber'
+# This script takes the below inputs
+# --------------------------------------------------------------------
+# Inputs:
+# Subscription-Id --> Subscription in which to run the demo
+# endpoint-Url --> The Subscriber where the published events must be routed
+# --------------------------------------------------------------------
+
+export subscription_Id=<<Subscription-ID>>
+export endpoint_Url=<<End Point Url>>
+
+# Set the contect to the azure account
+
+az account set --subscription $subscription_Id
+
+# Create the new azure resource group
+
+az group create --name "m1-eventgriddemo" --location westcentralus
+
+# Create a blob storage account for demo
+
+az storage account create \
+  --name m1eventgridstorage \
+  --location westcentralus \
+  --resource-group m1-eventgriddemo \
+  --sku Standard_LRS \
+  --kind BlobStorage \
+  --access-tier Hot
+
+
+# enroll the Blob Storage account to publish events
+
+storageid=$(az storage account show --name m1eventgridstorage --resource-group m1-eventgriddemo --query id --output tsv)
+
+az eventgrid event-subscription create \
+  --resource-id $storageid \
+  --name m1eventgridsubsciption \
+  --endpoint $endpoint_Url
+
+
+ # Trigger event from the Blob Storage. A file is stored in Blob storage to trigger the event
+
+ export AZURE_STORAGE_ACCOUNT=m1eventgridstorage
+export AZURE_STORAGE_ACCESS_KEY="$(az storage account keys list --account-name m1eventgridstorage --resource-group m1-eventgriddemo --query "[0].value" --output tsv)"
+
+az storage container create --name testcontainer
+
+touch testfile.txt
+az storage blob upload --file testfile.txt --container-name testcontainer --name testfile.txt
