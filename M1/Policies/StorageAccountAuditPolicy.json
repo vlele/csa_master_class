@@ -1,0 +1,19 @@
+﻿{
+  "if": {
+    "allOf": [
+      {
+        "field": "type",
+        "equals": "Microsoft.Storage/storageAccounts"
+      },
+      {
+        "not": {
+          "field": "Microsoft.Storage/storageAccounts/sku.name",
+          "in": ["Standard_GRS", "Standard_ZRS"]
+        }
+      }
+    ]
+  },
+  "then": {
+    "effect": "Audit"
+  }
+}
