@@ -1,0 +1,254 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlServerVM1Name": {
+      "type": "string",
+      "maxLength": 15,
+      "metadata": {
+        "description": "Name for the SQL Server VM, lowercase alphanumeric"
+      }
+    },
+    "sqlServerVM2Name": {
+      "type": "string",
+      "maxLength": 15,
+      "metadata": {
+        "description": "Name for the SQL Server VM, lowercase alphanumeric"
+      }
+    },
+    "sqlWitnessShareVMName": {
+      "type": "string",
+      "maxLength": 15,
+      "metadata": {
+        "description": "Name for the SQL Server VM, lowercase alphanumeric"
+      }
+    },
+    "sqlAvailabilitySetName": {
+      "type": "string",
+      "maxLength": 40,
+      "metadata": {
+        "description": "Name for the SQL Always On Availability Set name, lowercase alphanumeric"
+      }
+    },
+    "sqlStorageAccountPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Name for the SQL Servers Storage account prefix, lowercase alphanumeric"
+      }
+    },
+    "storageAccountType": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ],
+      "metadata": {
+        "description": "Type of new Storage Accounts (Standard_LRS, Standard_GRS, Standard_RAGRS or Premium_LRS) to be created to store VM disks"
+      },
+      "defaultValue": "Premium_LRS"
+    },
+    "sqlVMSize": {
+      "type": "string",
+      "metadata": {
+        "description": "Size of the SQL VMs to be created"
+      },
+      "defaultValue": "Standard_DS3_V2"
+    },
+    "sqlWitnessVMSize": {
+      "type": "string",
+      "metadata": {
+        "description": "Size of the Witness VM to be created"
+      },
+      "defaultValue": "Standard_DS1_V2"
+    },
+    "localAdminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the local Administrator of the Virtual Machines"
+      }
+    },
+    "localAdminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for the local Administrator account of the Virtual Machines"
+      }
+    },
+    "existingDomainName": {
+      "type": "string",
+      "metadata": {
+        "description": "DNS domain name for existing Active Directory domain"
+      },
+      "defaultValue": "contoso.com"
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the Administrator of the existing Active Directory Domain"
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Password for the Administrator account of the existing Active Directory Domain"
+      }
+    },
+    "sqlServerServiceAccountUserName": {
+      "type": "string",
+      "metadata": {
+        "description": "The SQL Server Service account name"
+      }
+    },
+    "sqlServerServiceAccountPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The SQL Server Service account password"
+      }
+    },
+    "existingVirtualNetworkId": {
+      "type": "string",
+      "metadata": {
+        "description": "Resource ID of the existing VNET. You can find the Resource ID for the VNET on the Properties blade of the VNET."
+      }
+    },
+    "existingSqlSubnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the existing subnet in the existing VNET to which the SQL & Witness VMs should be deployed"
+      },
+      "defaultValue": "default"
+    },
+    "existingAdPDCVMName": {
+      "type": "string",
+      "maxLength": 15,
+      "metadata": {
+        "description": "Computer name of the existing Primary AD domain controller & DNS server"
+      }
+    },
+    "sqlAlwaysOnClusterName": {
+      "type": "string",
+      "maxLength": 15,
+      "metadata": {
+        "description": "Name for the SQL Always On Cluster, lowercase alphanumeric. This will be created in the AD"
+      }
+    },
+    "sqlAlwaysOnListenerName": {
+      "type": "string",
+      "maxLength": 15,
+      "metadata": {
+        "description": "Name for the SQL Always On Cluster, lowercase alphanumeric. This will be created in the AD"
+      }
+    },
+    "sqlILBName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the ILB for the SQL Server AlwaysOn to be created"
+      },
+      "defaultValue": ""
+    },
+    "sqlLBIPAddress": {
+      "type": "string",
+      "metadata": {
+        "description": "IP address of ILB for the SQL Server AlwaysOn listener to be created"
+      },
+      "defaultValue": "10.0.1.10"
+    },
+    "_artifactsLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "Location of resources that the script is dependent on such as linked templates and DSC modules"
+      },
+      "defaultValue": "https://raw.githubusercontent.com/vlele/csa_master_class/master/M1/sqlao-existing-vent-and-dc/"
+    },
+    "_artifactsLocationSasToken": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+      },
+      "defaultValue": ""
+    }
+  },
+  "variables": {
+    "sqlSubnetRef": "[concat(parameters('existingVirtualNetworkId'),'/subnets/',parameters('existingSqlSubnetName'))]",
+    "deploySqlClusterTemplateURL": "[concat(parameters('_artifactsLocation'),'/nested/deploy-sql-cluster-managed-disks.json',parameters('_artifactsLocationSasToken'))]",
+    "deploySqlCluster": "deploySqlCluster",
+    "sqlAlwaysOnValues": {
+      "domainName": "[parameters('existingDomainName')]",
+      "dnsServerName": "[parameters('existingAdPDCVMName')]",
+      "sqlAvailabilitySetName": "[parameters('sqlAvailabilitySetName')]",
+      "nicSubnetUri": "[variables('sqlSubnetRef')]",
+      "lbSubnetUri": "[variables('sqlSubnetRef')]",
+      "sqlStorageAccountPrefix": "[parameters('sqlStorageAccountPrefix')]",
+      "sqlStorageAccountCount": 3,
+      "storageAccountType": "[parameters('storageAccountType')]",
+      "sqlAlwaysOnClusterName": "[parameters('sqlAlwaysOnClusterName')]",
+      "sqlAlwaysOnListenerName": "[parameters('sqlAlwaysOnListenerName')]",
+      "sqlLBIPAddress": "[parameters('sqlLBIPAddress')]",
+      "sqlILBName": "[parameters('sqlILBName')]",
+      "sqlWitnessVMName": "[parameters('sqlWitnessShareVMName')]",
+      "sqlWitnessVMSize": "[parameters('sqlWitnessVMSize')]",
+      "sqlWitnessImageReference": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2012-R2-Datacenter",
+        "version": "latest"
+      },
+      "sqlWitnessSharePath": "sqlao-fsw",
+      "sqlServerVMNames": [
+        "[parameters('sqlServerVM1Name')]",
+        "[parameters('sqlServerVM2Name')]"
+      ],
+      "sqlVMSize": "[parameters('sqlVMSize')]",
+      "sqlServerImageReference": {
+        "publisher": "MicrosoftSQLServer",
+        "offer": "SQL2014SP2-WS2012R2",
+        "sku": "Enterprise",
+        "version": "latest"
+      },
+      "sqlAlwaysOnAvailabilityGroupName": "SQL-OP-AG",
+      "sqlServerServiceAccountUserName": "[parameters('sqlServerServiceAccountUserName')]",
+      "sqlServerServiceAccountPassword": "[parameters('sqlServerServiceAccountPassword')]",
+      "localAdminUsername": "[parameters('localAdminUsername')]",
+      "localAdminPassword": "[parameters('localAdminPassword')]",
+      "tags": {
+        "LOB": "LOB",
+        "POC": "testemail@test1.com",
+        "Project": "Project1"
+      }
+    }
+  },
+  "resources": [
+    {
+      "name": "[variables('deploySqlCluster')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('deploySqlClusterTemplateURL')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "sqlAlwaysOnValues": {
+            "value": "[variables('sqlAlwaysOnValues')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "_artifactsLocation": {
+            "value": "[parameters('_artifactsLocation')]"
+          },
+          "_artifactsLocationSasToken": {
+            "value": "[parameters('_artifactsLocationSasToken')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
