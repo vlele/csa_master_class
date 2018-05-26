@@ -1,0 +1,114 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "sqlAlwaysOnValues": {
+      "type": "secureObject"
+    },
+    "adminUsername": {
+      "type": "string"
+    },
+    "adminPassword": {
+      "type": "securestring"
+    },
+    "_artifactsLocation": {
+      "type": "string"
+    },
+    "_artifactsLocationSasToken": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "sqlAOPrepareModulesURL": "[concat(parameters('_artifactsLocation'),'/dsc/prepare-sql-alwayson-server.ps1.zip',parameters('_artifactsLocationSasToken'))]",
+    "sqlAOPrepareConfigurationFunction": "PrepareAlwaysOnSqlServer.ps1\\PrepareAlwaysOnSqlServer",
+    "createClusterModulesURL": "[concat(parameters('_artifactsLocation'),'/dsc/create-failover-cluster.ps1.zip',parameters('_artifactsLocationSasToken'))]",
+    "createClusterConfigurationFunction": "CreateFailoverCluster.ps1\\CreateFailoverCluster"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('sqlAlwaysOnValues').sqlServerVMNames[1],'/sqlAOPrepare')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.17",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "wmfVersion": "5.0",
+          "modulesUrl": "[variables('sqlAOPrepareModulesURL')]",
+          "configurationFunction": "[variables('sqlAOPrepareConfigurationFunction')]",
+          "properties": {
+            "domainName": "[parameters('sqlAlwaysOnValues').domainName]",
+            "adminCreds": {
+              "userName": "[parameters('adminUsername')]",
+              "password": "PrivateSettingsRef:adminPassword"
+            },
+            "sqlServiceCreds": {
+              "userName": "[parameters('sqlAlwaysOnValues').sqlServerServiceAccountUserName]",
+              "password": "PrivateSettingsRef:sqlServerServiceAccountPassword"
+            }
+          }
+        },
+        "protectedSettings": {
+          "items": {
+            "adminPassword": "[parameters('adminPassword')]",
+            "sqlServerServiceAccountPassword": "[parameters('sqlAlwaysOnValues').sqlServerServiceAccountPassword]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('sqlAlwaysOnValues').sqlServerVMNames[0],'/CreateCluster')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/',parameters('sqlAlwaysOnValues').sqlServerVMNames[1],'/extensions/sqlAOPrepare')]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.17",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "wmfVersion": "5.0",
+          "modulesUrl": "[variables('createClusterModulesURL')]",
+          "configurationFunction": "[variables('createClusterConfigurationFunction')]",
+          "properties": {
+            "domainName": "[parameters('sqlAlwaysOnValues').domainName]",
+            "clusterName": "[parameters('sqlAlwaysOnValues').sqlAlwaysOnClusterName]",
+            "sharePath": "[concat('\\\\',parameters('sqlAlwaysOnValues').sqlWitnessVMName,'\\',parameters('sqlAlwaysOnValues').sqlWitnessSharePath)]",
+            "nodes": "[parameters('sqlAlwaysOnValues').sqlServerVMNames]",
+            "sqlAlwaysOnEndpointName": "[concat(parameters('sqlAlwaysOnValues').sqlAlwaysOnAvailabilityGroupName,'-EndPoint')]",
+            "sqlAlwaysOnAvailabilityGroupName": "[parameters('sqlAlwaysOnValues').sqlAlwaysOnAvailabilityGroupName]",
+            "sqlAlwaysOnAvailabilityGroupListenerName": "[parameters('sqlAlwaysOnValues').sqlAlwaysOnListenerName]",
+            "sqlAlwaysOnAvailabilityGroupListenerPort": 1433,
+            "lbName": "[parameters('sqlAlwaysOnValues').sqlILBName]",
+            "lbAddress": "[parameters('sqlAlwaysOnValues').sqlLBIPAddress]",
+            "primaryReplica": "[parameters('sqlAlwaysOnValues').sqlServerVMNames[0]]",
+            "secondaryReplica": "[parameters('sqlAlwaysOnValues').sqlServerVMNames[1]]",
+            "dnsServerName": "[parameters('sqlAlwaysOnValues').dnsServerName]",
+            "adminCreds": {
+              "userName": "[parameters('adminUsername')]",
+              "password": "PrivateSettingsRef:adminPassword"
+            },
+            "sqlServiceCreds": {
+              "userName": "[parameters('sqlAlwaysOnValues').sqlServerServiceAccountUserName]",
+              "password": "PrivateSettingsRef:sqlServerServiceAccountPassword"
+            }
+          }
+        },
+        "protectedSettings": {
+          "items": {
+            "adminPassword": "[parameters('adminPassword')]",
+            "sqlServerServiceAccountPassword": "[parameters('sqlAlwaysOnValues').sqlServerServiceAccountPassword]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
