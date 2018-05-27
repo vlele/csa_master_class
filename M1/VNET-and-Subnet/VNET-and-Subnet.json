@@ -19,6 +19,8 @@
     "firstVNETFESubnet2Prefix": "10.200.98.16/28",
     "firstVNETFESubnetName3": "m1-subnet1",
     "firstVNETFESubnet3Prefix": "10.200.98.32/28",
+    "firstVNETFESubnetName4": "GatewaySubnet",
+    "firstVNETGatewaySubnetPrefix": "10.200.98.48/28",
     "secondVNETName": "m1-vnet-02",
     "secondVNETPrefix": "10.200.99.0/24",
     "secondVNETSubnetName1": "m1-vnet02-subnet1",
@@ -64,6 +66,12 @@
             "name": "[variables('firstVNETFESubnetName3')]",
             "properties": {
               "addressPrefix": "[variables('firstVNETFESubnet3Prefix')]"
+            }
+          },
+          {
+            "name": "[variables('firstVNETFESubnetName4')]",
+            "properties": {
+              "addressPrefix": "[variables('firstVNETGatewaySubnetPrefix')]"
             }
           }
         ]
